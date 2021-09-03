@@ -1,3 +1,5 @@
+var fs = require('fs');
+
 var CSV_CHAR = ",";
 var COLON_CHAR = ":";
 var SEMI_COLON_CHAR = ";";
@@ -126,16 +128,26 @@ function createTemplate(product, headers, records) {
 }
 
 
-var csvRecords = require("fs").readFileSync("file.csv", "utf8").split("\r\n");
+var csvRecords = fs.readFileSync("input/file.csv", "utf8").split("\r\n");
 var headers = csvRecords[0].split(CSV_CHAR);
 var records =  csvRecords.slice(1).map((line) => line.split(CSV_CHAR));
 
 var args = process.argv.slice(2);
 var product = args[0] || "";
-var template = createTemplate(product, headers, records);
-var translate = translate(headers, csvRecords);
+var template = JSON.stringify(createTemplate(product, headers, records));
+var translate =  JSON.stringify(translate(headers, csvRecords));
+
+fs.writeFile('output/configuration.json', template, function (err) {
+    if (err) throw err;
+    console.log('Template Saved!');
+});
+
+fs.writeFile('output/translate.json', translate, function (err) {
+    if (err) throw err;
+    console.log('Translate Saved!');
+});
 
 
-console.log("Translate: " + JSON.stringify(translate));
+console.log("Translate: " + translate);
 console.log("\n");
-console.log("Template: " + JSON.stringify(template));
+console.log("Template: " + template);
