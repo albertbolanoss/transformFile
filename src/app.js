@@ -5,12 +5,25 @@ var SESSION_KEY = "session";
 var ID_KEY = "id";
 var LABEL_KEY = "label";
 var TYPE_KEY = "type";
-var BATCH_KEY = "isbatch"
-var DATA_KEY = "data";
 var FILE_FIELD_TYPE_KEY = "fileFieldType";
 var KEY_VALUE_SELECT = "key-value-select";
-var NUMERIC = "numeric";
-var NUMBER = "number";
+
+function checkValue(value) {
+    if (!value)
+        return value;
+
+    if (!isNaN(value)) {
+        value = parseInt(value);
+    }
+
+    if (typeof value === "boolean" ||
+        typeof value === "string" && (value.toLowerCase() === "true" || value.toLowerCase() === "false")
+    ) {
+        value = Boolean(value);
+    }
+
+    return value;
+}
 
 function transformToJson(headers, values) {
     var item = {};
@@ -21,16 +34,6 @@ function transformToJson(headers, values) {
     for (let index = 0; index < headers.length; index++) {
         var key = headers[index];
         var value = values[index];
-        var fileFieldType = values[indexFileFieldType] ? values[indexFileFieldType].toLowerCase() : "";
-        var type = values[indexType] ? values[indexType].toLowerCase() : "";
-
-        if (key === BATCH_KEY) {
-            value = Boolean(value);
-        }
-
-        if (key === DATA_KEY && fileFieldType === NUMERIC || type === NUMBER) {
-            value = parseInt(value);
-        }
 
         if (value && key !== SESSION_KEY) {
             if (key.includes(COLON_CHAR)) {
@@ -44,7 +47,7 @@ function transformToJson(headers, values) {
                 });
 
             } else {
-                item[key] = value;
+                item[key] = checkValue(value);
                 item[LABEL_KEY] = id;
             }
         }
